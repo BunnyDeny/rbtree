@@ -1,29 +1,33 @@
 # 简单 Makefile: 编译红黑树测试程序
 # 用法:
-#   make        - 编译生成 rbtree_test
+#   make        - 编译生成 build/rbtree_test
 #   make run    - 编译并运行测试
-#   make clean  - 清理生成文件
+#   make clean  - 清理 build 目录
 
 CC      ?= gcc
 CFLAGS  ?= -Wall -Wextra -O2
 
-TARGET  := rbtree_test
+BUILD   := build
+TARGET  := $(BUILD)/rbtree_test
 SRCS    := main.c rbtree.c
-OBJS    := $(SRCS:.c=.o)
+OBJS    := $(SRCS:%.c=$(BUILD)/%.o)
 
 all: $(TARGET)
+
+$(BUILD):
+	mkdir -p $@
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
-# 头文件变化时也重新编译
-%.o: %.c rbtree.h
+# 目标文件和头文件变化时都重新编译
+$(BUILD)/%.o: %.c rbtree.h | $(BUILD)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -rf $(BUILD)
 
 .PHONY: all run clean
